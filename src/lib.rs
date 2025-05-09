@@ -1,6 +1,5 @@
 use std::io::{stdout, Write};
 
-use nu_ansi_term::Style;
 
 
 pub mod extras;
@@ -9,6 +8,7 @@ pub mod geometry;
 use geometry::*;
 pub use geometry::{Vec2, Rect};
 pub use extras::{DrawableToArea, DrawableToPos, clear_area, clear_terminal, move_cursor_to};
+pub use nu_ansi_term::{Style, Color};
 
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
