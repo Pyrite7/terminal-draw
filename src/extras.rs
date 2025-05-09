@@ -1,5 +1,3 @@
-use nu_ansi_term::AnsiString;
-
 use crate::*;
 
 
@@ -56,7 +54,7 @@ pub fn move_cursor_to(pos: impl Vec2) {
     stdout().flush().unwrap();
 }
 
-
+/// Clears a rectangular area of the terminal.
 pub fn clear_area(area: impl Rect) {
     draw(area, |_| ' '.into());
 }
