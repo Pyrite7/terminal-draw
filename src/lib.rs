@@ -5,7 +5,7 @@ use std::io::{stdout, Write};
 use nu_ansi_term::Style;
 
 
-
+pub mod extras;
 
 
 
@@ -237,17 +237,6 @@ mod geometry_tests {
 
 
 
-/// Clears all text from the terminal and resets the cursor position and text style.
-pub fn clear_terminal() {
-    print!("\x1B[2J\x1B[H\x1B[0m");
-    stdout().flush().unwrap();
-}
-
-/// Moves the cursor to a position. Useful after calling draw() to move the terminal prompt to a desired location.
-pub fn move_cursor_to(pos: impl Vec2) {
-    print!("\x1B[{};{}H", pos.y(), pos.x());
-    stdout().flush().unwrap();
-}
 
 
 
