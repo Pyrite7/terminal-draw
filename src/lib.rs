@@ -156,17 +156,17 @@ impl<N1: Int, N2: Int> Vec2 for (N1, N2) {
 pub type DefVec2 = (u16, u16);
 
 pub trait Rect: Sized {
-    fn top(&self) -> u16;
     fn left(&self) -> u16;
+    fn top(&self) -> u16;
     fn h(&self) -> u16;
     fn w(&self) -> u16;
-    fn new(top: u16, left: u16, w: u16, h: u16) -> Self;
+    fn new(left: u16, top: u16, w: u16, h: u16) -> Self;
 
     fn bottom(&self) -> u16 {
-        self.top() + self.h()
+        self.top() + self.h() - 1
     }
     fn right(&self) -> u16 {
-        self.left() + self.w()
+        self.left() + self.w() - 1
     }
 
     fn top_left(&self) -> DefVec2 {
@@ -183,7 +183,7 @@ pub trait Rect: Sized {
     }
 
     fn from<T: Rect>(t: &T) -> Self {
-        Self::new(t.top(), t.left(), t.w(), t.h())
+        Self::new(t.left(), t.top(), t.w(), t.h())
     }
     fn into<T: Rect>(&self) -> T {
         T::from(self)
@@ -198,18 +198,41 @@ impl<V1: Vec2, V2: Vec2> Rect for (V1, V2) {
         self.0.x().min(self.1.x())
     }
     fn h(&self) -> u16 {
-        self.0.y().max(self.1.y()) - self.top()
+        self.0.y().max(self.1.y()) - self.top() + 1
     }
     fn w(&self) -> u16 {
-        self.0.x().max(self.1.x()) - self.top()
+        self.0.x().max(self.1.x()) - self.left() + 1
     }
-    fn new(top: u16, left: u16, w: u16, h: u16) -> Self where Self: Sized {
-        (V1::new(left, top), V2::new(left + w, top + h))
+    fn new(left: u16, top: u16, w: u16, h: u16) -> Self where Self: Sized {
+        (V1::new(left, top), V2::new(left + w - 1, top + h - 1))
     }
 }
 
 pub type DefRect = (DefVec2, DefVec2);
 
+
+#[cfg(test)]
+mod geometry_tests {
+    use super::*;
+
+    #[test]
+    fn rect_works() {
+        let r1 = DefRect::new(1, 2, 1, 1);
+        let r2 = DefRect::new(3, 5, 2, 2);
+        
+        assert_eq!(r1, ((1, 2), (1, 2)));
+        assert_eq!(r2, ((3, 5), (4, 6)));
+    }
+
+    #[test]
+    fn rect_size() {
+        let r1 = DefRect::new(1, 2, 1, 1);
+
+        assert_eq!(r1.w(), 1);
+        assert_eq!(r1.h(), 1);
+        assert_eq!(r1.bottom_right(), (1, 2));
+    }
+}
 
 
 
@@ -266,10 +289,10 @@ pub fn draw(area: impl Rect, mut contents: impl FnMut(DefVec2) -> AnsiChar) {
 
     state.reset_style();
 
-    for row in area.top()..area.bottom() {
+    for row in area.top()..=area.bottom() {
         state.cursor_to((area.left(), row));
 
-        for col in area.left()..area.right() {
+        for col in area.left()..=area.right() {
             state.push(contents((col - area.left(), row - area.top())));
         }
     }
@@ -278,7 +301,6 @@ pub fn draw(area: impl Rect, mut contents: impl FnMut(DefVec2) -> AnsiChar) {
 
     println!("{}", state.string);
 }
-
 
 
 
