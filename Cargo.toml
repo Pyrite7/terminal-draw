@@ -2,6 +2,8 @@
 name = "terminal-draw"
 version = "0.1.0"
 edition = "2021"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/Pyrite7/terminal-draw"
 
 [dependencies]
 nu-ansi-term = "0.50.1"
