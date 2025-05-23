@@ -1,13 +1,11 @@
-use std::io::{stdout, Write};
+use std::io::Write;
 
 
 
-pub mod extras;
 pub mod geometry;
 
 use geometry::*;
 pub use geometry::{Vec2, Rect};
-pub use extras::{DrawableToArea, DrawableToPos, clear_area, clear_terminal, move_cursor_to};
 pub use nu_ansi_term::{Style, Color};
 
 
@@ -58,8 +56,9 @@ impl DrawState {
 }
 
 
-/// Prints a rectangle of styled Unicode characters to stdout.
-pub fn draw(area: impl Rect, mut contents: impl FnMut(DefVec2) -> AnsiChar) {
+/// Prints a rectangle of styled Unicode characters to the given Writer.
+/// Note that the writer has to be flushed after this.
+pub fn draw_to(writer: &mut impl Write, area: impl Rect, mut contents: impl FnMut(DefVec2) -> AnsiChar) -> std::io::Result<()> {
     let mut state = DrawState::new();
 
     state.reset_style();
@@ -74,9 +73,33 @@ pub fn draw(area: impl Rect, mut contents: impl FnMut(DefVec2) -> AnsiChar) {
     
     state.reset_style();
 
-    println!("{}", state.string);
+    writer.write_all(state.string.as_bytes())?;
+    Ok(())
 }
 
+
+
+
+/// Sends an ANSI command to clear all text from the terminal and resets the cursor position and text style.
+/// Note that the writer has to be flushed after this.
+pub fn clear_all(writer: &mut impl Write) -> std::io::Result<()> {
+    writer.write_all(b"\x1B[2J\x1B[H\x1B[0m")?;
+    Ok(())
+}
+
+/// Sends an ANSI command to move the cursor to a position. Useful after calling draw() to move the terminal prompt to a desired location.
+/// Note that the writer has to be flushed after this.
+pub fn move_cursor_to(writer: &mut impl Write, pos: impl Vec2) -> std::io::Result<()> {
+    writer.write_all(format!("\x1B[{};{}H", pos.y(), pos.x()).as_bytes())?;
+    Ok(())
+}
+
+/// Clears a rectangular area of the terminal.
+/// Note that the writer has to be flushed after this.
+pub fn clear_area(writer: &mut impl Write, area: impl Rect) -> std::io::Result<()> {
+    draw_to(writer, area, |_| ' '.into())?;
+    Ok(())
+}
 
 
 

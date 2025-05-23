@@ -1,5 +1,5 @@
 [package]
-name = "text-ui"
+name = "terminal-draw"
 version = "0.1.0"
 edition = "2021"
 
