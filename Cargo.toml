@@ -1,9 +1,11 @@
 [package]
 name = "terminal-draw"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 license = "MIT OR Apache-2.0"
+description = "A very simple library for terminal output"
 repository = "https://github.com/Pyrite7/terminal-draw"
+readme = "README.md"
 
 [dependencies]
 nu-ansi-term = "0.50.1"
